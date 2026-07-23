@@ -5,40 +5,31 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\ReservationController;
 
-/*
-|------------------------------------------------------------------------
-| Page d'accueil
 
-*/
 
 Route::get('/', function () {
     return redirect()->route('login');
 });
+Route::get('/test-view', function () {
+    return view('admin.events.index');
+});
 
-/*
-|--------------------------------------------------------------------------
-| Authentification
-|--------------------------------------------------------------------------
-*/
 
-Route::middleware('guest')->group(function () {
+
+// Route::middleware('guest')->group(function () {
 
     Route::get('/login', [AuthController::class, 'showLogin'])
         ->name('login');
 
     Route::post('/login', [AuthController::class, 'login'])
         ->name('login.store');
-});
+// });
 
 Route::post('/logout', [AuthController::class, 'logout'])
     ->middleware('auth')
     ->name('logout');
 
-/*
-|--------------------------------------------------------------------------
-| Routes Étudiant
-|--------------------------------------------------------------------------
-*/
+
 
 Route::middleware('auth')->group(function () {
 
@@ -59,11 +50,6 @@ Route::middleware('auth')->group(function () {
         ->name('reservations.mine');
 });
 
-/*
-|--------------------------------------------------------------------------
-| Routes Admin
-|--------------------------------------------------------------------------
-*/
 
 Route::prefix('admin')
     ->middleware(['auth', 'admin'])
@@ -92,4 +78,6 @@ Route::prefix('admin')
         // Suivi des réservations
         Route::get('/events/{event}/reservations', [ReservationController::class, 'forEvent'])
             ->name('reservations.for-event');
+
+
     });
