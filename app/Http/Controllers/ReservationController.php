@@ -4,58 +4,60 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use App\Models\Reservation;
-use App\Http\Requests\StoreReservationRequest;
+use App\Models\Ticket;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class ReservationController extends Controller
 {
-    public function store(StoreReservationRequest $request)
+    // Réserver un événement
+    public function store(Event $event)
     {
-        $event = Event::findOrFail($request->event_id);
-        $student = auth()->user();
-
-        // Vérification 1 : l'étudiant a-t-il déjà réservé cet événement ?
-        $dejaReserve = Reservation::where('student_id', $student->id)
-            ->where('event_id', $event->id)
-            ->exists();
-
-        if ($dejaReserve) {
-            return back()->with('error', 'Vous êtes déjà inscrit à cet événement.');
-        }
-
-        // Vérification 2 : reste-t-il des places ?
+        // Vérifier si l'événement est complet
         if ($event->placesRestantes() <= 0) {
             return back()->with('error', 'Cet événement est complet.');
         }
 
-        // Création de la réservation
+        // Vérifier si l'étudiant est déjà inscrit
+        $exists = Reservation::where('student_id', Auth::id())
+            ->where('event_id', $event->id)
+            ->exists();
+
+        if ($exists) {
+            return back()->with('error', 'Vous êtes déjà inscrit à cet événement.');
+        }
+
+        // Créer la réservation
         $reservation = Reservation::create([
-            'student_id' => $student->id,
+            'student_id' => Auth::id(),
             'event_id' => $event->id,
-            'reserved_at' => now(),
         ]);
 
-        // Génération automatique du ticket associé
-        $reservation->ticket()->create([
-            'code_qr' => null, // à générer plus tard avec un package QR
+        // Générer le ticket
+        Ticket::create([
+            'reservation_id' => $reservation->id,
+            'ticket_code' => 'BDE-' . date('Y') . '-' . strtoupper(Str::random(5)),
         ]);
 
-        return redirect()->route('reservations.mine')->with('success', 'Réservation confirmée !');
+        return redirect()->route('reservations.mine')
+            ->with('success', 'Réservation effectuée avec succès.');
     }
 
-    // Liste des réservations de l'étudiant connecté ("Mes Billets")
+    // Mes billets
     public function mine()
     {
-        $reservations = Reservation::where('student_id', auth()->id())
+        $reservations = Reservation::where('student_id', Auth::id())
             ->with(['event', 'ticket'])
             ->get();
 
         return view('reservations.mine', compact('reservations'));
     }
 
-    // Vue admin : voir les réservations d'un événement (US 1.2)
+    // Liste des réservations d'un événement (Admin)
     public function forEvent(Event $event)
     {
         $reservations = $event->reservations()->with('student')->get();
-        return view('reservations.for-event', compact('event', 'reservations'));
+
+        return view('admin.reservations.index', compact('event', 'reservations'));
     }
 }
