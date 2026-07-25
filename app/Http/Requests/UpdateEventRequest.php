@@ -8,7 +8,7 @@ class UpdateEventRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user() && $this->user()->role === 'admin';
+        return auth()->check() && auth()->user()->role === 'admin';
     }
 
     public function rules(): array
@@ -16,7 +16,7 @@ class UpdateEventRequest extends FormRequest
         return [
             'titre' => 'required|string|max:255',
             'description' => 'required|string',
-            'date' => 'required|date',
+            'date' => 'required|date|after_or_equal:today',
             'heure' => 'required',
             'lieu' => 'required|string|max:255',
             'prix' => 'required|numeric|min:0',
@@ -27,7 +27,16 @@ class UpdateEventRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'places.min' => 'La capacité doit être un entier positif supérieur à 0.',
+            'titre.required' => 'Le titre est obligatoire.',
+            'description.required' => 'La description est obligatoire.',
+            'date.required' => 'La date est obligatoire.',
+            'date.after_or_equal' => 'La date doit être aujourd\'hui ou une date future.',
+            'heure.required' => 'L\'heure est obligatoire.',
+            'lieu.required' => 'Le lieu est obligatoire.',
+            'prix.required' => 'Le prix est obligatoire.',
+            'prix.min' => 'Le prix doit être supérieur ou égal à 0.',
+            'places.required' => 'Le nombre de places est obligatoire.',
+            'places.min' => 'Le nombre de places doit être supérieur à 0.',
         ];
     }
 }

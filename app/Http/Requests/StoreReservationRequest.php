@@ -8,14 +8,11 @@ class StoreReservationRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        // Seul un étudiant connecté peut réserver
-        return $this->user() && $this->user()->role === 'student';
+        return auth()->check();
     }
 
     public function rules(): array
     {
-        return [
-            'event_id' => 'required|exists:events,id',
-        ];
+        return [];
     }
 }

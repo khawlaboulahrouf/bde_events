@@ -6,25 +6,29 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
- public function up(): void
-{
-    Schema::create('reservations', function (Blueprint $table) {
-        $table->id();
-        $table->foreignId('student_id')->constrained('users')->onDelete('cascade'); // l'étudiant qui réserve
-        $table->foreignId('event_id')->constrained('events')->onDelete('cascade'); // l'événement réservé
-        $table->timestamp('reserved_at')->useCurrent(); // date/heure de la réservation
-        $table->timestamps();
+    public function up(): void
+    {
+        Schema::create('reservations', function (Blueprint $table) {
 
-        $table->unique(['student_id', 'event_id']); // empêche un étudiant de réserver 2 fois le même événement
-    });
-}
+            $table->id();
 
-    /**
-     * Reverse the migrations.
-     */
+            $table->foreignId('student_id')
+                  ->constrained('users')
+                  ->cascadeOnDelete();
+
+            $table->foreignId('event_id')
+                  ->constrained()
+                  ->cascadeOnDelete();
+
+            $table->timestamp('reserved_at')->useCurrent();
+
+            $table->timestamps();
+
+            $table->unique(['student_id','event_id']);
+
+        });
+    }
+
     public function down(): void
     {
         Schema::dropIfExists('reservations');

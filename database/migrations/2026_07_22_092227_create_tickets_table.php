@@ -6,23 +6,23 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
- public function up(): void
-{
-    Schema::create('tickets', function (Blueprint $table) {
-        $table->id();
-        $table->foreignId('reservation_id')->constrained('reservations')->onDelete('cascade');
-        $table->string('ticket_code')->unique(); 
-        $table->string('code_qr')->nullable();
-        $table->timestamps();
-    });
-}
+    public function up(): void
+    {
+        Schema::create('tickets', function (Blueprint $table) {
 
-    /**
-     * Reverse the migrations.
-     */
+            $table->id();
+
+            $table->foreignId('reservation_id')
+                  ->constrained()
+                  ->cascadeOnDelete();
+
+            $table->string('ticket_code')->unique();
+
+            $table->timestamps();
+
+        });
+    }
+
     public function down(): void
     {
         Schema::dropIfExists('tickets');
