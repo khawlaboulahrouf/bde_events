@@ -9,72 +9,65 @@ use App\Http\Requests\UpdateEventRequest;
 
 class EventController extends Controller
 {
-    // Liste des événements
     public function index()
     {
-        $events = Event::latest()->get();
+        $events =Event::latest()->get();
 
-        if (Auth::user()->role == 'admin') {
-            return view('admin.events.index', compact('events'));
-        }
-
-        return view('events.index', compact('events'));
+        if(Auth::user()->role == 'admin')
+            {
+                return view('admin.events.index',compact('events'));
+            }
+        return view('events.index',compact('events'));
     }
 
-    // Formulaire d'ajout
     public function create()
     {
-        return view('admin.events.create');
+        return view ('admin.events.create');
     }
 
-    // Enregistrer un événement
     public function store(StoreEventRequest $request)
     {
         Event::create([
-            'admin_id'    => Auth::id(),
-            'titre'       => $request->titre,
+            'admin_id' => Auth::id(),
+            'titre'    => $request->titre,
             'description' => $request->description,
-            'date'        => $request->date,
-            'heure'       => $request->heure,
-            'lieu'        => $request->lieu,
-            'prix'        => $request->prix,
-            'places'      => $request->places,
+            'date'   => $request->date,
+            'heure' => $request->heure,
+            'lieu' => $request->lieu,
+            'prix' => $request->prix,
+            'places' => $request->places,
         ]);
 
         return redirect()
-            ->route('admin.events.index')
-            ->with('success', 'Événement ajouté avec succès.');
+           ->route('admin.events.index')
+           ->with('success' , 'Evenement ajouté avec succes');
     }
 
-    // Détails
     public function show(Event $event)
     {
         return view('events.show', compact('event'));
     }
 
-    // Formulaire modification
     public function edit(Event $event)
     {
         return view('admin.events.edit', compact('event'));
     }
 
-    // Modifier
-    public function update(UpdateEventRequest $request, Event $event)
+    public function update(UpdateEventRequest $request , Event $event)
     {
         $event->update($request->validated());
 
         return redirect()
-            ->route('admin.events.index')
-            ->with('success', 'Événement modifié avec succès.');
+        ->route('admin.events.index')
+        ->with('succes', 'Evenement modifié avec succes');
     }
 
-    // Supprimer
     public function destroy(Event $event)
     {
         $event->delete();
 
         return redirect()
-            ->route('admin.events.index')
-            ->with('success', 'Événement supprimé avec succès.');
+        ->route('admin.events.index')
+        ->with('succes', 'Evenement supprimer avec succes');
     }
 }
