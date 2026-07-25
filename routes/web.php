@@ -5,31 +5,37 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\ReservationController;
 
-
+/*
+|--------------------------------------------------------------------------
+| Page d'accueil
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/', function () {
     return redirect()->route('login');
 });
-Route::get('/test-view', function () {
-    return view('admin.events.index');
-});
 
+/*
+|--------------------------------------------------------------------------
+| Authentification
+|--------------------------------------------------------------------------
+*/
 
+Route::get('/login', [AuthController::class, 'showLogin'])
+    ->name('login');
 
-// Route::middleware('guest')->group(function () {
-
-    Route::get('/login', [AuthController::class, 'showLogin'])
-        ->name('login');
-
-    Route::post('/login', [AuthController::class, 'login'])
-        ->name('login.store');
-// });
+Route::post('/login', [AuthController::class, 'login'])
+    ->name('login.store');
 
 Route::post('/logout', [AuthController::class, 'logout'])
     ->middleware('auth')
     ->name('logout');
 
-
+/*
+|--------------------------------------------------------------------------
+| Étudiant
+|--------------------------------------------------------------------------
+*/
 
 Route::middleware('auth')->group(function () {
 
@@ -41,7 +47,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/events/{event}', [EventController::class, 'show'])
         ->name('events.show');
 
-    // Réserver un événement
+    // Réservation
     Route::post('/events/{event}/reserve', [ReservationController::class, 'store'])
         ->name('reservations.store');
 
@@ -50,23 +56,28 @@ Route::middleware('auth')->group(function () {
         ->name('reservations.mine');
 });
 
+/*
+|--------------------------------------------------------------------------
+| Admin
+|--------------------------------------------------------------------------
+*/
 
 Route::prefix('admin')
     ->middleware(['auth', 'admin'])
     ->name('admin.')
     ->group(function () {
 
-        // Gestion des événements
+        // Dashboard admin
         Route::get('/events', [EventController::class, 'index'])
             ->name('events.index');
 
+        // Ajouter événement
         Route::get('/events/create', [EventController::class, 'create'])
             ->name('events.create');
 
         Route::post('/events', [EventController::class, 'store'])
             ->name('events.store');
-
-        Route::get('/events/{event}/edit', [EventController::class, 'edit'])
+             Route::get('/events/{event}/edit', [EventController::class, 'edit'])
             ->name('events.edit');
 
         Route::put('/events/{event}', [EventController::class, 'update'])
@@ -75,9 +86,7 @@ Route::prefix('admin')
         Route::delete('/events/{event}', [EventController::class, 'destroy'])
             ->name('events.destroy');
 
-        // Suivi des réservations
+        // Voir les réservations d'un événement
         Route::get('/events/{event}/reservations', [ReservationController::class, 'forEvent'])
             ->name('reservations.for-event');
-
-
     });

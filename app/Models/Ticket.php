@@ -12,7 +12,6 @@ class Ticket extends Model
     protected $fillable = [
         'reservation_id',
         'ticket_code',
-        'code_qr',
     ];
 
     // Un ticket appartient à une réservation

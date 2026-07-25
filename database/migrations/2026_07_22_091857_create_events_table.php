@@ -13,14 +13,14 @@ return new class extends Migration
 {
     Schema::create('events', function (Blueprint $table) {
         $table->id();
-        $table->foreignId('admin_id')->constrained('users')->onDelete('cascade'); // l'admin qui a créé l'événement
+        $table->foreignId('admin_id')->constrained('users')->onDelete('cascade');
         $table->string('titre');
         $table->text('description');
         $table->date('date');
         $table->time('heure');
         $table->string('lieu');
-        $table->float('prix')->default(0); // 0 = événement gratuit
-        $table->unsignedInteger('places'); // jauge maximale de places
+        $table->decimal('prix',8,2)->default(0);
+        $table->unsignedInteger('places');
         $table->timestamps();
     });
 }
