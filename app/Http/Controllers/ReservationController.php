@@ -32,12 +32,12 @@ class ReservationController extends Controller
         'event_id' => $event->id,
         'reserved_at'=> now(),
     ]);
-   
+
 
     $reservation->ticket()->create([
         'ticket_code' => 'BDE-' .strtoupper(uniqid()),
     ]);
-    return redirect()->route('resvations.mine')
+    return redirect()->route('resevations.mine')
     ->with('success' , 'Reservation effectuée avec succes');
    }
 
