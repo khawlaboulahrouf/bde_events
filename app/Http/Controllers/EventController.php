@@ -6,32 +6,31 @@ use App\Models\Event;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\StoreEventRequest;
 use App\Http\Requests\UpdateEventRequest;
+use Illuminate\Support\Facades\Redirect;
 
 class EventController extends Controller
 {
-    public function index()
+    public function index ()
     {
-        $events =Event::latest()->get();
+        $events= Event::latest()->get();
 
-        if(Auth::user()->role == 'admin')
-            {
-                return view('admin.events.index',compact('events'));
-            }
+        if(Auth::user()->role == 'admin'){
+            return view('admin.events.index' ,compact('events'));
+        }
         return view('events.index',compact('events'));
     }
 
     public function create()
     {
-        return view ('admin.events.create');
+        return view('admin.events.create');
     }
 
-    public function store(StoreEventRequest $request)
-    {
+    public function store(StoreEventRequest $request){
         Event::create([
             'admin_id' => Auth::id(),
-            'titre'    => $request->titre,
+            'titre'  =>$request->titre,
             'description' => $request->description,
-            'date'   => $request->date,
+            'date' => $request->date,
             'heure' => $request->heure,
             'lieu' => $request->lieu,
             'prix' => $request->prix,
@@ -39,27 +38,27 @@ class EventController extends Controller
         ]);
 
         return redirect()
-           ->route('admin.events.index')
-           ->with('success' , 'Evenement ajouté avec succes');
+          ->route('admin.events.index')
+          ->with('success','Evenement ajoute avec succes');
     }
 
     public function show(Event $event)
     {
-        return view('events.show', compact('event'));
+        return view('events.show',compact('event'));
     }
 
     public function edit(Event $event)
     {
-        return view('admin.events.edit', compact('event'));
+        return view('admin.events.edit' , compact('event'));
     }
 
-    public function update(UpdateEventRequest $request , Event $event)
+    public function update(UpdateEventRequest $request, Event $event)
     {
         $event->update($request->validated());
 
         return redirect()
         ->route('admin.events.index')
-        ->with('succes', 'Evenement modifié avec succes');
+        ->with('success' , 'evenement modifie avec success');
     }
 
     public function destroy(Event $event)
@@ -68,6 +67,6 @@ class EventController extends Controller
 
         return redirect()
         ->route('admin.events.index')
-        ->with('succes', 'Evenement supprimer avec succes');
+        ->with('success' , 'evenement supprimer avec success');
     }
 }
