@@ -69,4 +69,5 @@ class EventController extends Controller
         ->route('admin.events.index')
         ->with('success' , 'evenement supprimer avec success');
     }
+    
 }

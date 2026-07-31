@@ -16,7 +16,7 @@ public function up(): void
         $table->string('name');
         $table->string('lastname');
         $table->string('email')->unique();
-        $table->enum('role', ['admin', 'student'])->default('student'); // distingue Admin / Student
+        $table->enum('role', ['admin', 'student'])->default('student'); 
         $table->timestamp('email_verified_at')->nullable();
         $table->string('password');
         $table->rememberToken();

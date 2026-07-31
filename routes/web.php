@@ -9,7 +9,8 @@ use Illuminate\Auth\Events\Logout;
 Route::get('/',function (){
     return redirect()->route('login');
 });
-
+Route::get('/login', [AuthController::class, 'showLogin'])
+    ->name('login');
 Route::post('/login',[AuthController::class, 'login'])->name('login.store');
 Route::post('/logout',[AuthController::class, 'logout'])
  ->middleware('auth')
@@ -18,7 +19,7 @@ Route::post('/logout',[AuthController::class, 'logout'])
  Route::middleware('auth')->group(function(){
     Route::get('/events',[EventController::class, 'index'])->name('events.index');
     Route::get('/events/{event}',[EventController::class, 'show'])->name('events.show');
-    Route::post('/events/{event}',[EventController::class, 'store'])->name('reservations.store');
+    Route::post('/events/{event}',[ReservationController::class, 'store'])->name('reservations.store');
     Route::get('/mes-billets',[ReservationController::class, 'mine'])->name('reservations.mine');
  });
 
@@ -27,7 +28,7 @@ Route::post('/logout',[AuthController::class, 'logout'])
   ->name('admin.events.index');
  Route::get('/admin/events/create',[EventController::class, 'create'])
  ->middleware(['auth','admin'])
- ->name('admini.events.create');
+ ->name('admin.events.create');
  Route::post('admin/events',[EventController::class, 'store'])
   ->middleware(['auth','admin'])
   ->name('admin.events.store');
