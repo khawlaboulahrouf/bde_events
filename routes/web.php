@@ -6,6 +6,9 @@ use App\Http\Controllers\EventController;
 use App\Http\Controllers\ReservationController;
 use Illuminate\Auth\Events\Logout;
 
+
+
+
 Route::get('/',function (){
     return redirect()->route('login');
 });

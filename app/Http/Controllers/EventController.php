@@ -12,7 +12,8 @@ class EventController extends Controller
 {
     public function index ()
     {
-        $events= Event::latest()->get();
+         $events= Event::latest()->get();
+
 
         if(Auth::user()->role == 'admin'){
             return view('admin.events.index' ,compact('events'));
@@ -69,5 +70,5 @@ class EventController extends Controller
         ->route('admin.events.index')
         ->with('success' , 'evenement supprimer avec success');
     }
-    
+
 }
