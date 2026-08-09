@@ -9,18 +9,27 @@ use Illuminate\Http\Request;
 class EventApiController extends Controller
 {
     public function index()
-{
-    $events = Event::with('admin')
-        ->withCount('reservations')
-        ->latest()
-        ->get();
+    {
+        $events = Event::with('admin')
+            ->withCount('reservations')
+            ->latest()
+            ->get();
 
-    return response()->json([
-        'events' => $events
-    ], 200);
-}
+        return response()->json([
+            'events' => $events
+        ], 200);
+    }
 
+    public function show(Event $event)
+    {
+        $event->load('admin');
 
+        $event->loadCount('reservations');
+
+        return response()->json([
+            'event' => $event
+        ], 200);
+    }
 
     public function store(Request $request)
     {
@@ -51,5 +60,23 @@ class EventApiController extends Controller
         ], 201);
     }
 
+    public function update(Request $request, Event $event)
+{
+    $validated = $request->validate([
+        'titre' => 'sometimes|required|string|max:255',
+        'description' => 'sometimes|required|string',
+        'date' => 'sometimes|required|date',
+        'heure' => 'sometimes|required',
+        'lieu' => 'sometimes|required|string|max:255',
+        'prix' => 'sometimes|required|numeric|min:0',
+        'places' => 'sometimes|required|integer|min:1',
+    ]);
 
+    $event->update($validated);
+
+    return response()->json([
+        'message' => 'Événement modifié avec succès.',
+        'event' => $event->fresh()
+    ], 200);
+}
 }
