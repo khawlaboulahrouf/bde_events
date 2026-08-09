@@ -25,6 +25,7 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
 
     Route::post('/events', [EventApiController::class, 'store']);
     Route::put('/events/{event}', [EventApiController::class, 'update']);
+    Route::delete('/events/{event}', [EventApiController::class, 'destroy']);
 
 });
 

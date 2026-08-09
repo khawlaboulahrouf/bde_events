@@ -79,4 +79,13 @@ class EventApiController extends Controller
         'event' => $event->fresh()
     ], 200);
 }
+
+public function destroy(Event $event)
+{
+    $event->delete();
+
+    return response()->json([
+        'message' => 'Événement supprimé avec succès.'
+    ], 200);
+}
 }
