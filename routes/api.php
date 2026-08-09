@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthApiController;
+use App\Http\Controllers\Api\EventApiController;
 
 Route::post('/login', [AuthApiController::class, 'login']);
 
@@ -19,3 +20,11 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     });
 
 });
+
+Route::middleware(['auth:sanctum', 'admin'])->group(function () {
+
+    Route::post('/events', [EventApiController::class, 'store']);
+
+});
+
+Route::get('/events', [EventApiController::class, 'index']);
