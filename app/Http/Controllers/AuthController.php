@@ -5,8 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class AuthController extends Controller{
-    public function showLogin ()
+class AuthController extends Controller
+{
+    public function showLogin()
     {
         return view('auth.login');
     }
@@ -18,22 +19,31 @@ class AuthController extends Controller{
             'password' => 'required',
         ]);
 
-        if(Auth::attempt($credentials)){
+        if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
 
-            if(Auth::user()->role === 'admin'){
+            if (Auth::user()->role === 'admin') {
                 return redirect()->route('admin.events.index');
             }
             return redirect()->route('events.index');
         }
-        return back()->with('error','Email ou mot de passe incorrect');
+        return back()->with('error', 'Email ou mot de passe incorrect');
     }
 
     public function logout(Request $request)
     {
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-        return redirect()->route('login');
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json([
+            'message' => 'Déconnexion réussie.'
+        ]);
     }
+
+    // public function logout(Request $request)
+    // {
+    //     Auth::logout();
+    //     $request->session()->invalidate();
+    //     $request->session()->regenerateToken();
+    //     return redirect()->route('login');
+    // }
 }
