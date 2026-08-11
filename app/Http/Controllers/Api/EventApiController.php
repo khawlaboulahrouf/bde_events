@@ -4,16 +4,19 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Event;
+use App\Services\EventService;
 use Illuminate\Http\Request;
 
 class EventApiController extends Controller
 {
+    public function __construct(
+        private EventService $eventService
+    ) {
+    }
+
     public function index()
     {
-        $events = Event::with('admin')
-            ->withCount('reservations')
-            ->latest()
-            ->get();
+        $events = $this->eventService->getAllEvents();
 
         return response()->json([
             'events' => $events
@@ -22,9 +25,7 @@ class EventApiController extends Controller
 
     public function show(Event $event)
     {
-        $event->load('admin');
-
-        $event->loadCount('reservations');
+        $event = $this->eventService->getEvent($event);
 
         return response()->json([
             'event' => $event
@@ -43,16 +44,10 @@ class EventApiController extends Controller
             'places' => 'required|integer|min:1',
         ]);
 
-        $event = Event::create([
-            'admin_id' => $request->user()->id,
-            'titre' => $validated['titre'],
-            'description' => $validated['description'],
-            'date' => $validated['date'],
-            'heure' => $validated['heure'],
-            'lieu' => $validated['lieu'],
-            'prix' => $validated['prix'],
-            'places' => $validated['places'],
-        ]);
+        $event = $this->eventService->createEvent(
+            $request->user(),
+            $validated
+        );
 
         return response()->json([
             'message' => 'Événement créé avec succès.',
@@ -61,31 +56,34 @@ class EventApiController extends Controller
     }
 
     public function update(Request $request, Event $event)
-{
-    $validated = $request->validate([
-        'titre' => 'sometimes|required|string|max:255',
-        'description' => 'sometimes|required|string',
-        'date' => 'sometimes|required|date',
-        'heure' => 'sometimes|required',
-        'lieu' => 'sometimes|required|string|max:255',
-        'prix' => 'sometimes|required|numeric|min:0',
-        'places' => 'sometimes|required|integer|min:1',
-    ]);
+    {
+        $validated = $request->validate([
+            'titre' => 'sometimes|required|string|max:255',
+            'description' => 'sometimes|required|string',
+            'date' => 'sometimes|required|date',
+            'heure' => 'sometimes|required',
+            'lieu' => 'sometimes|required|string|max:255',
+            'prix' => 'sometimes|required|numeric|min:0',
+            'places' => 'sometimes|required|integer|min:1',
+        ]);
 
-    $event->update($validated);
+        $event = $this->eventService->updateEvent(
+            $event,
+            $validated
+        );
 
-    return response()->json([
-        'message' => 'Événement modifié avec succès.',
-        'event' => $event->fresh()
-    ], 200);
-}
+        return response()->json([
+            'message' => 'Événement modifié avec succès.',
+            'event' => $event
+        ], 200);
+    }
 
-public function destroy(Event $event)
-{
-    $event->delete();
+    public function destroy(Event $event)
+    {
+        $this->eventService->deleteEvent($event);
 
-    return response()->json([
-        'message' => 'Événement supprimé avec succès.'
-    ], 200);
-}
+        return response()->json([
+            'message' => 'Événement supprimé avec succès.'
+        ], 200);
+    }
 }
